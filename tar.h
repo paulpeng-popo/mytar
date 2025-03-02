@@ -10,22 +10,27 @@
 #include <sys/stat.h>
 using namespace std;
 
-// file type values (1 octet)
-#define REGULAR          0
-#define NORMAL          '0'
-#define HARDLINK        '1'
-#define SYMLINK         '2'
-#define CHAR            '3'
-#define BLOCK           '4'
-#define DIRECTORY       '5'
-#define FIFO            '6'
-#define CONTIGUOUS      '7'
+// file type
+#define REGULAR '\0'
+#define NORMAL '0'
+#define HARDLINK '1'
+#define SYMLINK '2'
+#define CHAR '3'
+#define BLOCK '4'
+#define DIRECTORY '5'
+#define FIFO '6'
+#define CONTIGUOUS '7'
 
-#define ERROR(fmt, ...) (cerr << "Error: " << fmt << endl, ##__VA_ARGS__); return -1;
+#define ERROR(fmt, ...)                      \
+	{                                        \
+		fprintf(stderr, fmt, ##__VA_ARGS__); \
+		exit(1);                             \
+	}
 
-void Usage();
-unsigned int Oct2uint(string oct);
-int Iszero(string str);
+#define WARN(fmt, ...)                       \
+	{                                        \
+		fprintf(stderr, fmt, ##__VA_ARGS__); \
+	}
 
 typedef struct TarHeader
 {
@@ -38,27 +43,39 @@ typedef struct TarHeader
 	char checksum[8];
 	char type;
 	char lname[100];
-			
-	/* USTAR Section */
-	char USTAR_id[6];
-	char USTAR_ver[2];
+
+	/* UStar Section */
+	char UStar_id[6];
+	char UStar_ver[2];
 	char username[32];
 	char groupname[32];
 	char devmajor[8];
 	char devminor[8];
 	char prefix[155];
 	char pad[12];
-}Tar;
+} Tar;
 
-class TarFile{
+string modeToStr(mode_t mode, char ftype);
+void dec2oct(char *oct, int size, int dec);
+int oct2dec(char *oct, int size);
+int computeChecksum(Tar header);
+bool isEmptyBlock(char *block, int size);
+
+class TarFile
+{
 public:
-	TarFile(const char* file);
-	int tarRead();
-	int tarLs();
-	int LsEntry(Tar aTar);
+	TarFile(string tarfile);
+	~TarFile();
+	void create(vector<string> files, bool verbose);
+	void list(bool verbose);
+	void extract(bool verbose);
+
 private:
-	const char* filename;
-	vector<Tar> tarVec;
+	string tarfile;
+	vector<Tar> entries;
+
+	void addFile(string filename, ofstream &out, bool verbose);
+	void extractFile(string filename, int size, ifstream &in);
 };
 
 #endif

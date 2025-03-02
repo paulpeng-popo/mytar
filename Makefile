@@ -13,7 +13,7 @@ dep:
 	$(CC) $(FLAGS) -c $(FILE).cpp
 
 create:
-	@rsync -a --exclude=*.pdf . a/
+	@rsync -a --exclude=*.pdf --exclude=.git . a/
 	@tar -cvf $(TARFILE).tar a/
 	@rm -rf a/
 
