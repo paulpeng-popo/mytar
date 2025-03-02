@@ -8,7 +8,7 @@ Reference:
 - [GNU tar](https://www.gnu.org/software/tar/manual/html_node/Standard.html)
 - [tar.h (IBM)](https://www.ibm.com/docs/en/aix/7.3?topic=files-tarh-file)
 
-**The program should run on the Linux/Unix system.**
+**This program should run on the Linux/Unix system.**
 
 ## To build
 
